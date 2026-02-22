@@ -1,0 +1,10 @@
+paddlepaddle-gpu
+paddleocr
+shapely
+scikit-image
+imgaug
+pyclipper
+lmdb
+tqdm
+numpy
+opencv-python
