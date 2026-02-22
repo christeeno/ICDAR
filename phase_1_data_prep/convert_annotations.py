@@ -27,25 +27,16 @@ def convert_to_paddle_format(json_path, output_path, path_prefix):
             paddle_labels = []
             for group in entry.get('groups', []):
                 for item in group:
-                    if item.get('illegible', False):
-                        continue # Skip illegible text for training if desired, or keep it. Usually skip or mark as ###
-                    
-                    text = item['text']
+                    text = item.get('text', "")
+                    is_illegible = item.get('illegible', False)
                     vertices = item['vertices']
                     
-                    points = np.array(vertices, dtype=np.float32)
-                    
-                    # Convert to 4 points (rotated rectangle)
-                    rect = cv2.minAreaRect(points)
-                    box = cv2.boxPoints(rect)
-                    box = np.int32(box)
-                    
-                    # Sort points to be consistent (top-left, top-right, bottom-right, bottom-left) - PaddleOCR expects this order roughly
-                    # Actually PaddleOCR just needs 4 points in clockwise order. boxPoints returns them in clockwise order usually.
+                    if is_illegible:
+                         text = "###_REVIEW_NEEDED_###" 
                     
                     paddle_labels.append({
                         "transcription": text,
-                        "points": box.tolist()
+                        "points": vertices
                     })
             
             if paddle_labels:
